@@ -1,0 +1,20 @@
+{
+    "name": "azerothcore/acore-wp-plugin",
+    "description": "AzerothCore plugin for WordPress",
+    "license": "AGPL3",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "ACore\\": "src/",
+            "ACore\\Components\\": "src/Components/",
+            "ACore\\Hooks\\": "src/Hooks/",
+            "ACore\\Manager\\": "src/Manager/"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "doctrine/orm": "^2.10",
+        "symfony/cache": "^5.3"
+    },
+    "minimum-stability": "stable"
+}
