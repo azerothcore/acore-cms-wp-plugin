@@ -40,8 +40,10 @@ class CharChange extends \ACore\Lib\WpClass {
 
     /**
      * Whether to offer the gift field on the product page. Uses the display SKU,
-     * which for the variable "char-change" product is the parent (variations all
-     * map to giftable services), so the base SKU is accepted here too.
+     * which for the variable "char-change" product is the parent, so the base
+     * SKU is accepted here too. Not every variation is giftable (deleted
+     * character restoration is not): the field is hidden per variation client
+     * side, and isGiftEligible gates the variation SKU server side.
      */
     private static function isGiftableDisplaySku($sku): bool {
         return self::giftingEnabled()
@@ -98,7 +100,39 @@ class CharChange extends \ACore\Lib\WpClass {
         // the normal self-service (instant apply to the selected character).
         if (self::isGiftableDisplaySku($product->get_sku())) {
             FieldElements::destCharacter(__('Gift to a character (optional, leave blank to apply to your own selected character):', 'acore-wp-plugin'));
+            if ($product->is_type('variable')) {
+                self::giftFieldVariationToggle();
+            }
         }
+    }
+
+    /**
+     * The gift field renders once for the whole variable product, but not every
+     * variation is giftable (char-restore-delete has no token equivalent).
+     * Hide the field, and clear anything typed into it, while a non-giftable
+     * variation is selected. isGiftEligible ignores the recipient server side
+     * either way; this keeps the offer from showing in the first place.
+     */
+    private static function giftFieldVariationToggle(): void {
+        ?>
+        <script>
+            jQuery(function ($) {
+                var giftableSkus = <?= json_encode(array_keys(self::$tokenTypes)) ?>;
+                var giftField = $('.acore-gift-field');
+                $('form.variations_form')
+                    .on('found_variation', function (event, variation) {
+                        var giftable = giftableSkus.indexOf(variation.sku) !== -1;
+                        giftField.toggle(giftable);
+                        if (!giftable) {
+                            giftField.find('input').val('');
+                        }
+                    })
+                    .on('reset_data', function () {
+                        giftField.hide().find('input').val('');
+                    });
+            });
+        </script>
+        <?php
     }
 
     // 3) SAVE INTO ITEM DATA

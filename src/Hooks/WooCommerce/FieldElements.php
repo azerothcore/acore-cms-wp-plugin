@@ -105,9 +105,11 @@ class FieldElements {
 
     public static function destCharacter($label): void {
         ?>
-        <label for="acore_char_dest"><?= $label ?></label>
-        <input type="text" placeholder="Character name..." id="acore_char_dest" class="acore_char_dest" name="acore_char_dest">
-        <br>
+        <div class="acore-gift-field">
+            <label for="acore_char_dest"><?= $label ?></label>
+            <input type="text" placeholder="Character name..." id="acore_char_dest" class="acore_char_dest" name="acore_char_dest">
+            <br>
+        </div>
         <?php
     }
 
